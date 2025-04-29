@@ -1,10 +1,10 @@
 import dotenv from 'dotenv';
 import express from 'express';
-import connectDB from './src/config/dbconfig';
-import userRoutes from './src/routes/user';
-import productRoutes from './src/routes/product';
-import cartRoutes from './src/routes/cart';
-import orderRoutes from './src/routes/order';
+import connectDB from './config/dbconfig';
+import userRoutes from './routes/user';
+import productRoutes from './routes/product';
+import cartRoutes from './routes/cart';
+import orderRoutes from './routes/order';
 
 dotenv.config();
 
