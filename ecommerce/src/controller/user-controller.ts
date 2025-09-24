@@ -21,7 +21,7 @@ export const registration = async (req: CustomRequest, res: Response): Promise<v
   try {
     const { name, email, phoneNo, password, role } = req.body;
 
-    const existingUser = await User.findOne({ email });
+    const existingUser = await User.findOne({ email,role });
     if (existingUser) {
       res.status(400).json({ status: false, message: 'User already exists' });
       return;
@@ -38,7 +38,11 @@ export const registration = async (req: CustomRequest, res: Response): Promise<v
     });
 
     await newUser.save();
-    res.status(200).json({ status: true, message: 'Registered successfully' });
+    const token=jwt.sign({email:newUser.email,role:newUser.role},
+      JWT_SECURITY_KEY
+    )
+     
+    res.status(200).json({ status: true, message: 'Registered successfully',token });
   } catch (error) {
     console.error(error);
     res.status(500).json({ status: false, message: 'Internal server error' });
@@ -46,34 +50,79 @@ export const registration = async (req: CustomRequest, res: Response): Promise<v
 };
 
 // User Login
+// export const loginUser = async (req: Request, res: Response): Promise<void> => {
+//   try {
+//     const { email, password } = req.body;
+
+//     if (!email || !password) {
+//       res.status(400).json({ status: false, message: 'Email and password are required' });
+//       return;
+//     }
+
+//     const foundUser = await User.findOne({ email });
+//     if (!foundUser) {
+//       res.status(400).json({ status: false, message: 'Invalid credentials' });
+//       return;
+//     }
+
+//     const isMatch = await bcrypt.compare(password, foundUser.password);
+//     if (!isMatch) {
+//       res.status(400).json({ status: false, message: 'Invalid credentials' });
+//       return;
+//     }
+
+//     const token = jwt.sign(
+//       { userId: foundUser._id, role: foundUser.role },
+//       JWT_SECURITY_KEY,
+    
+//     );
+
+//     res.status(200).json({ status: true, message: 'Login successful', token });
+//   } catch (error) {
+//     console.error('Login error:', error);
+//     res.status(500).json({ status: false, message: 'Internal server error' });
+//   }
+// };
+
+
 export const loginUser = async (req: Request, res: Response): Promise<void> => {
   try {
     const { email, password } = req.body;
+    const role = req.query.role as string; 
 
-    if (!email || !password) {
-      res.status(400).json({ status: false, message: 'Email and password are required' });
+    if (!email || !password || !role) {
+      res.status(400).json({ status: false, message: 'Email, password and role are required' });
       return;
     }
 
-    const foundUser = await User.findOne({ email });
+    const foundUser = await User.findOne({ email, role });
     if (!foundUser) {
-      res.status(400).json({ status: false, message: 'Invalid credentials' });
+      res.status(400).json({ status: false, message: 'Email is incorrect or role mismatch' });
       return;
     }
 
     const isMatch = await bcrypt.compare(password, foundUser.password);
     if (!isMatch) {
-      res.status(400).json({ status: false, message: 'Invalid credentials' });
+      res.status(400).json({ status: false, message: 'Password is incorrect' });
       return;
     }
 
     const token = jwt.sign(
-      { userId: foundUser._id, role: foundUser.role },
-      JWT_SECURITY_KEY,
-    //   { expiresIn: '1d' }
+      { userId: foundUser._id, email: foundUser.email, role: foundUser.role },
+      JWT_SECURITY_KEY as string,
+      
     );
 
-    res.status(200).json({ status: true, message: 'Login successful', token });
+    res.status(200).json({
+      status: true,
+      message: `Login successful as ${foundUser.role}`,
+      token,
+      data: {
+        name: foundUser.name,
+        email: foundUser.email,
+        role: foundUser.role,
+      },
+    });
   } catch (error) {
     console.error('Login error:', error);
     res.status(500).json({ status: false, message: 'Internal server error' });

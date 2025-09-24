@@ -4,17 +4,17 @@
   "description": "",
   "license": "ISC",
   "author": "",
-  "type": "module",
- 
-  "main": "./src/index.ts",
+  "type": "commonjs",
+  "main": "index.js",
   "scripts": {
     "dev": "nodemon",
     "build": "npm install && npx tsc",
-    "start": "node ./dist/index.js"
+    "start": "node index.ts"
   },
   "dependencies": {
     "auth": "^1.2.3",
     "bcrypt": "^5.1.1",
+    "cloudinary": "^2.6.0",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
     "express-validator": "^7.2.1",

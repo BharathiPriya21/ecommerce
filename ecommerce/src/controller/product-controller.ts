@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import Product from '../model/product';
+import {v2 as cloudinary} from 'cloudinary';
 
 interface CustomRequest extends Request {
   user?: {
@@ -8,6 +9,12 @@ interface CustomRequest extends Request {
     role: string;
   };
 }
+import 'dotenv/config';
+cloudinary.config({
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.CLOUD_API_KEY,
+  api_secret: process.env.CLOUD_API_SECRET,
+});
 
 // Create Product
 export const createProduct = async (req: CustomRequest, res: Response): Promise<any> => {
@@ -21,13 +28,20 @@ export const createProduct = async (req: CustomRequest, res: Response): Promise<
             });
         }
 
-    const { title, description, price, stock, category, image_url } = req.body;
+    const { title, description, price, stock, category } = req.body;
 
     if (!title || !price || !stock || !category) {
       res.status(400).json({ status: false, error: 'Title, price, stock, and category are required' });
       return;
     }
+    
+    if(req.file)
+    {
+      res.status(400).json({status:false,message:"product image is required"});
 
+      const cloundinaryRes=await cloudinary.uploader.upload(req.file.path,{folder:'product'});
+    }
+    let image_url
     const newProduct = new Product({
       title,
       description,
