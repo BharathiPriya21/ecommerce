@@ -40,13 +40,14 @@ export const createProduct = async (req: CustomRequest, res: Response): Promise<
 
       const cloundinaryRes=await cloudinary.uploader.upload(req.file.path,{folder:'product'});
     }
+    let image_url
     const newProduct = new Product({
       title,
       description,
       price,
       stock,
       category,
-      
+      image_url,
       adminId: user.userId
     });
 
