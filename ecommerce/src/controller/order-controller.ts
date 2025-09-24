@@ -42,7 +42,7 @@ export const placeOrder = async (req: Request, res: Response): Promise<any> => {
 
     await newOrder.save();
 
-    await cart.save();
+    // await cart.save();
 
     res.status(200).json({ status: true, message: "Order placed successfully" });
   } catch (error) {
