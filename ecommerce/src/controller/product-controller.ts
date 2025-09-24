@@ -49,6 +49,7 @@ export const createProduct = async (req: CustomRequest, res: Response): Promise<
       stock,
       category,
       image_url,
+      
       adminId: user.userId
     });
 
